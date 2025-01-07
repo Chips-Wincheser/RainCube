@@ -26,13 +26,18 @@ public class Spawner : MonoBehaviour
             );
 
         _waitForSeconds = new WaitForSeconds(_repeatRate);
+        _platformCollider = GetComponent<BoxCollider>();
+    }
+
+    private void Start()
+    {
+        StartCoroutine(SpawnCubes());
     }
 
     private void CreateCube(Cube obj)
     {
         obj.LifeTimeOver+=PutCubeInPool;
 
-        _platformCollider = gameObject.GetComponent<BoxCollider>();
         Vector3 platformSize = _platformCollider.size;
 
         float randomX = Random.Range(-platformSize.x / 2, platformSize.x / 2);
@@ -41,7 +46,6 @@ public class Spawner : MonoBehaviour
         Vector3 randomPosition = new Vector3(randomX, positionY, randomZ);
 
         obj.transform.position = transform.position+randomPosition;
-        obj.GetComponent<Rigidbody>().velocity =Vector3.zero;
         obj.gameObject.SetActive(true);
     }
 
@@ -49,11 +53,6 @@ public class Spawner : MonoBehaviour
     {
         obj.LifeTimeOver -= PutCubeInPool;
         obj.gameObject.SetActive(false);
-    }
-
-    private void Start()
-    {
-        StartCoroutine(SpawnCubes());
     }
 
     private IEnumerator SpawnCubes()

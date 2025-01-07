@@ -11,7 +11,7 @@ public class Cube : MonoBehaviour
     private WaitForSeconds _waitForSeconds;
     private Renderer _cubeRenderer;
 
-    private bool _didCollision=false;
+    private bool _haveCollision=false;
     private int _lifeTime;
     private Color _color;
 
@@ -25,13 +25,19 @@ public class Cube : MonoBehaviour
     {
         Platform platform =collision.gameObject.GetComponent<Platform>();
 
-        if (platform!=null && _didCollision== false)
+        if (platform!=null && _haveCollision== false)
         {
             SetTimeLife();
             Paint();
             StartCoroutine(DisableAfterDelay());
-            _didCollision = true;
+            _haveCollision = true;
         }
+    }
+
+    private void OnDisable()
+    {
+        _cubeRenderer.material.color = Color.white;
+        _haveCollision = false;
     }
 
     private void Paint()
@@ -52,11 +58,5 @@ public class Cube : MonoBehaviour
         yield return _waitForSeconds;
         
         LifeTimeOver?.Invoke(this);
-    }
-
-    private void OnDisable()
-    {
-        _cubeRenderer.material.color = Color.white;
-        _didCollision = false;
     }
 }

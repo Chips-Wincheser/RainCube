@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5490142908736542959}
   - component: {fileID: 88883869068398328}
+  - component: {fileID: 1677933566368946169}
   m_Layer: 0
   m_Name: CubeSpawn
   m_TagString: Untagged
@@ -53,3 +54,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 10.998718, y: 1.4648743, z: 3.541748}
   m_Center: {x: 2.292633, y: 0.23243713, z: -0.25360107}
+--- !u!114 &1677933566368946169
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6664629403365412003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d0f64ac82cdd6a4ea077f40f795e781, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _prefab: {fileID: 8472386166900253643, guid: 5d60bec2ee701b942ba5ad238dd88c3f, type: 3}
+  _repeatRate: 1
+  _poolCapacity: 5
+  _poolMaxSize: 5

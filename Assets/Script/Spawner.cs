@@ -1,57 +1,74 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Pool;
 
 public class Spawner : MonoBehaviour
 {
-    [SerializeField] private GameObject _prefab;
-    [SerializeField] private GameObject _StartPoint;
+    [SerializeField] private Cube _prefab;
     [SerializeField] private float _repeatRate = 1f;
     [SerializeField] private int _poolCapacity = 5;
-    [SerializeField] private int _poolMaxSize=5;
+    [SerializeField] private int _poolMaxSize = 5;
 
-    private ObjectPool<GameObject> _pool;
-    private BoxCollider platformCollider;
+    private WaitForSeconds _waitForSeconds;
+    private ObjectPool<Cube> _pool;
+    private BoxCollider _platformCollider;
 
     private void Awake()
     {
-        _pool= new ObjectPool<GameObject>(
+        _pool= new ObjectPool<Cube>(
             createFunc: () => Instantiate(_prefab),
-            actionOnGet: (obj) => ActionOnGet(obj),
-            actionOnRelease: (obj) => obj.SetActive(false),
-            actionOnDestroy: (obj) => Destroy(obj),
+            actionOnGet: (obj) => CreateCube(obj),
+            actionOnRelease: (obj) => TurningOffCube(obj),
+            actionOnDestroy: (obj) => Destroy(obj.gameObject),
             collectionCheck: true,
             defaultCapacity: _poolCapacity,
             maxSize: _poolMaxSize
             );
+
+        _waitForSeconds = new WaitForSeconds(_repeatRate);
     }
 
-    private void ActionOnGet(GameObject obj)
+    private void CreateCube(Cube obj)
     {
-        platformCollider = _StartPoint.GetComponent<BoxCollider>();
-        Vector3 platformSize = platformCollider.size;
+        obj.LifeTimeOver+=PutCubeInPool;
+
+        _platformCollider = gameObject.GetComponent<BoxCollider>();
+        Vector3 platformSize = _platformCollider.size;
 
         float randomX = Random.Range(-platformSize.x / 2, platformSize.x / 2);
         float randomZ = Random.Range(-platformSize.z / 2, platformSize.z / 2);
         float positionY = -2f;
         Vector3 randomPosition = new Vector3(randomX, positionY, randomZ);
 
-        obj.transform.position = _StartPoint.transform.position+randomPosition;
+        obj.transform.position = transform.position+randomPosition;
         obj.GetComponent<Rigidbody>().velocity =Vector3.zero;
-        obj.SetActive(true);
+        obj.gameObject.SetActive(true);
+    }
+
+    private void TurningOffCube(Cube obj)
+    {
+        obj.LifeTimeOver -= PutCubeInPool;
+        obj.gameObject.SetActive(false);
     }
 
     private void Start()
     {
-        InvokeRepeating(nameof(GetSphere), 0.0f, _repeatRate);
+        StartCoroutine(SpawnCubes());
     }
 
-    private void GetSphere()
+    private IEnumerator SpawnCubes()
     {
-        _pool.Get();
+        while (true)
+        {
+            if (_pool.CountActive<_poolMaxSize)
+                _pool.Get();
+
+            yield return _waitForSeconds;
+        }
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void PutCubeInPool(Cube cube)
     {
-        _pool.Release(other.gameObject);
+        _pool.Release(cube);
     }
 }

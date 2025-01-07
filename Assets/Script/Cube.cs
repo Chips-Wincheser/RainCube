@@ -1,10 +1,15 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
+[RequireComponent(typeof(Renderer))]
+[RequireComponent(typeof(Rigidbody))]
 public class Cube : MonoBehaviour
 {
-    private Platform _platform;
+    public event Action<Cube> LifeTimeOver;
+
     private WaitForSeconds _waitForSeconds;
+    private Renderer _cubeRenderer;
 
     private bool _didCollision=false;
     private int _lifeTime;
@@ -12,36 +17,46 @@ public class Cube : MonoBehaviour
 
     private void Awake()
     {
-        int maxRandomValue = 5;
-        int minRandomValue = 2;
-
-        _lifeTime= Random.Range(minRandomValue, maxRandomValue);
         _color =Color.red;
-        _waitForSeconds = new WaitForSeconds(_lifeTime);
+        _cubeRenderer = GetComponent<Renderer>();
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        _platform =collision.gameObject.GetComponent<Platform>();
+        Platform platform =collision.gameObject.GetComponent<Platform>();
 
-        if (_platform!=null && _didCollision== false)
+        if (platform!=null && _didCollision== false)
         {
+            SetTimeLife();
             Paint();
-            StartCoroutine(DisableAfterDelay(gameObject));
+            StartCoroutine(DisableAfterDelay());
             _didCollision = true;
         }
     }
 
     private void Paint()
     {
-        Renderer _cubeRenderer = GetComponent<Renderer>();
         _cubeRenderer.material.color = _color;
     }
 
-    private IEnumerator DisableAfterDelay(GameObject cube)
+    private void SetTimeLife()
+    {
+        int maxRandomValue = 5;
+        int minRandomValue = 2;
+        _lifeTime= UnityEngine.Random.Range(minRandomValue, maxRandomValue);
+        _waitForSeconds = new WaitForSeconds(_lifeTime);
+    }
+
+    private IEnumerator DisableAfterDelay()
     {
         yield return _waitForSeconds;
+        
+        LifeTimeOver?.Invoke(this);
+    }
 
-        Destroy(cube);
+    private void OnDisable()
+    {
+        _cubeRenderer.material.color = Color.white;
+        _didCollision = false;
     }
 }

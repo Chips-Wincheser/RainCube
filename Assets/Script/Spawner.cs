@@ -38,10 +38,11 @@ public class Spawner : MonoBehaviour
     {
         obj.LifeTimeOver+=PutCubeInPool;
 
+        int HalfDivider = 2;
         Vector3 platformSize = _platformCollider.size;
 
-        float randomX = Random.Range(-platformSize.x / 2, platformSize.x / 2);
-        float randomZ = Random.Range(-platformSize.z / 2, platformSize.z / 2);
+        float randomX = Random.Range(-platformSize.x / HalfDivider, platformSize.x / HalfDivider);
+        float randomZ = Random.Range(-platformSize.z / HalfDivider, platformSize.z / HalfDivider);
         float positionY = -2f;
         Vector3 randomPosition = new Vector3(randomX, positionY, randomZ);
 

@@ -2,33 +2,20 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-[RequireComponent(typeof(Renderer))]
 [RequireComponent(typeof(Rigidbody))]
 public class Cube : MonoBehaviour
 {
     public event Action<Cube> LifeTimeOver;
-
     private WaitForSeconds _waitForSeconds;
-    private Renderer _cubeRenderer;
 
     private bool _haveCollision=false;
     private int _lifeTime;
-    private Color _color;
-
-    private void Awake()
-    {
-        _color =Color.red;
-        _cubeRenderer = GetComponent<Renderer>();
-    }
 
     private void OnCollisionEnter(Collision collision)
     {
-        Platform platform =collision.gameObject.GetComponent<Platform>();
-
-        if (platform!=null && _haveCollision== false)
+        if (collision.gameObject.TryGetComponent<Platform>(out Platform platform) && _haveCollision== false)
         {
             SetTimeLife();
-            Paint();
             StartCoroutine(DisableAfterDelay());
             _haveCollision = true;
         }
@@ -36,13 +23,7 @@ public class Cube : MonoBehaviour
 
     private void OnDisable()
     {
-        _cubeRenderer.material.color = Color.white;
         _haveCollision = false;
-    }
-
-    private void Paint()
-    {
-        _cubeRenderer.material.color = _color;
     }
 
     private void SetTimeLife()
